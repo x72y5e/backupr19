@@ -76,9 +76,13 @@ pub fn walk_compare(p: &Path, p2: &Path) {
                     walk_compare(&entry.path(), &mirror_path);
                 }
             }
-        } else {
-            println!("creating {}...", entry.path().to_str().unwrap());
+        } else if entry.path().is_file() {
+            println!("creating file {}...", entry.path().to_str().unwrap());
             fs::copy(entry.path(), mirror_path).expect("error creating file");
+        } else if entry.path().is_dir() {
+            println!("creating directory {}...", entry.path().to_str().unwrap());
+            fs::create_dir(mirror_path).expect("error creating directory");
+            walk_compare(&entry.path(), &mirror_path);
         }
     }
 }
