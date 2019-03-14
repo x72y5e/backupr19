@@ -23,6 +23,7 @@ pub fn hash_directory(path: &Path, level: u32) -> io::Result<FileHash> {
     hashed_dir
 }
 
+// TODO: replace this
 fn get_dirname(p: &Path) -> io::Result<String> {
     let components: Vec<_> = p
         .components()
