@@ -48,6 +48,7 @@ fn mirror_dir_name(path: &Path, base_path: &Path) -> Option<String> {
     None
 }
 
+// TODO: delete files from backup if not in original
 pub fn walk_compare(p: &Path, p2: &Path) {
     for entry in fs::read_dir(p).expect("error reading directory") {
         let entry = entry.expect("error parsing directory entry");
@@ -57,17 +58,17 @@ pub fn walk_compare(p: &Path, p2: &Path) {
             let dirs_match = compare_directories(&entry.path(), &mirror_path).unwrap();
             if !dirs_match {
                 if entry.path().is_file() {
-                    println!("updating {}...", entry.path().to_str().unwrap());
+                    println!("updating {}...\n", entry.path().to_str().unwrap());
                     fs::copy(entry.path(), mirror_path).expect("error copying file");
                 } else {
                     walk_compare(&entry.path(), &mirror_path);
                 }
             }
         } else if entry.path().is_file() {
-            println!("creating file {}...", entry.path().to_str().unwrap());
+            println!("creating file {}...\n", mirror_path.to_str().unwrap());
             fs::copy(entry.path(), mirror_path).expect("error creating file");
         } else if entry.path().is_dir() {
-            println!("creating directory {}...", entry.path().to_str().unwrap());
+            println!("creating directory {}...\n", mirror_path.to_str().unwrap());
             fs::create_dir(mirror_path).expect("error creating directory");
             walk_compare(&entry.path(), &mirror_path);
         }
