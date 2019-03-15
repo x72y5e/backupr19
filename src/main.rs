@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::fs;
 
-use crate::compare::walk_compare;
+use crate::compare::{walk_compare, sync_deleted_items};
 
 pub mod filehash;
 mod compare;
@@ -27,6 +27,7 @@ fn main() {
         println!("\nbacking up {} to {}\n", original, backup);
         let original = Path::new(original);
         let backup = Path::new(backup);
+        sync_deleted_items(&original, &backup);
         walk_compare(&original, &backup);
     } else {
         println!("\nError: Check config.txt is in form:\n\n\

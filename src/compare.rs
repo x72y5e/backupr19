@@ -48,7 +48,24 @@ fn mirror_dir_name(path: &Path, base_path: &Path) -> Option<String> {
     None
 }
 
-// TODO: delete files from backup if not in original
+pub fn sync_deleted_items(original: &Path, backup: &Path) -> io::Result<()> {
+    for entry in fs::read_dir(backup)? {
+        let entry = entry?;
+        let original_path = mirror_dir_name(&entry.path(), original);
+        if let Some(original_path) = original_path {
+            if !Path::new(&original_path).exists() {
+                println!("deleting: {}", original_path);
+                if entry.path().is_file() {
+                    fs::remove_file(entry.path());
+                } else if entry.path().is_dir() {
+                    fs::remove_dir_all(entry.path());
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
 pub fn walk_compare(p: &Path, p2: &Path) {
     for entry in fs::read_dir(p).expect("error reading directory") {
         let entry = entry.expect("error parsing directory entry");
@@ -61,6 +78,7 @@ pub fn walk_compare(p: &Path, p2: &Path) {
                     println!("updating {}...\n", entry.path().to_str().unwrap());
                     fs::copy(entry.path(), mirror_path).expect("error copying file");
                 } else {
+                    sync_deleted_items(&entry.path(), &mirror_path);
                     walk_compare(&entry.path(), &mirror_path);
                 }
             }
