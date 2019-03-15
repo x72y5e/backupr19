@@ -23,21 +23,6 @@ pub fn hash_directory(path: &Path, level: u32) -> io::Result<FileHash> {
     hashed_dir
 }
 
-// TODO: replace this
-fn get_dirname(p: &Path) -> io::Result<String> {
-    let components: Vec<_> = p
-        .components()
-        .map(|x| x.as_os_str())
-        .collect();
-    let dirname = components
-        .last()
-        .expect("could not parse dir name")
-        .to_str()
-        .expect("could not parse dir name")
-        .to_owned();
-    Ok(dirname)
-}
-
 fn compare_directories(path1: &Path, path2: &Path) -> io::Result<bool> {
     // return true if directories match
     let h1 = hash_directory(path1, 0)?;
@@ -46,10 +31,11 @@ fn compare_directories(path1: &Path, path2: &Path) -> io::Result<bool> {
 }
 
 fn mirror_dir_name(path: &Path, base_path: &Path) -> Option<String> {
-    let dirname = get_dirname(path); // returns Result - replace with .filename()
+    let dirname = path.file_name()
+        .and_then(|x| x.to_str());
     match dirname {
-        Err(_) => return None,
-        Ok(dirname) => {
+        None => return None,
+        Some(dirname) => {
             let p2 = base_path.clone();
             if let Some(p2) = p2.to_str() {
                 let mut p2_extended = p2.to_string();

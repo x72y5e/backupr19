@@ -14,16 +14,12 @@ pub struct FileHash {
 
 impl FileHash {
     pub fn try_from_file(path: &Path, level: u32) -> io::Result<Self> {
-        let components: Vec<_> = path
-            .components()
-            .map(|x| x.as_os_str())
-            .collect();
-        let fname = components
-            .last()
-            .expect("could not parse filename")
+        let fname = path
+            .file_name()
+            .expect("could not read file name")
             .to_str()
-            .expect("could not parse filename")
-            .to_owned();
+            .expect("could not read file name")
+            .to_string();
         let contents = fs::read(path).expect("could not read file");
         let mut hasher = DefaultHasher::new();
         contents.hash(&mut hasher);
@@ -32,16 +28,12 @@ impl FileHash {
 
     pub fn try_from_dir(path: &Path, level: u32, hashes: &str) -> io::Result<Self> {
         let mut hasher = DefaultHasher::new();
-        let components: Vec<_> = path
-            .components()
-            .map(|x| x.as_os_str())
-            .collect();
-        let dirname = components
-            .last()
-            .expect("could not parse dir name")
+        let dirname = path
+            .file_name()
+            .expect("could not read directory name")
             .to_str()
-            .expect("could not parse dir name")
-            .to_owned();
+            .expect("could not read directory name")
+            .to_string();
         hashes.hash(&mut hasher);
         Ok(FileHash { level, hash: hasher.finish(), name: dirname })
     }
