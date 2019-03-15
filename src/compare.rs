@@ -56,9 +56,9 @@ pub fn sync_deleted_items(original: &Path, backup: &Path) -> io::Result<()> {
             if !Path::new(&original_path).exists() {
                 println!("deleting: {}", original_path);
                 if entry.path().is_file() {
-                    fs::remove_file(entry.path());
+                    fs::remove_file(entry.path())?;
                 } else if entry.path().is_dir() {
-                    fs::remove_dir_all(entry.path());
+                    fs::remove_dir_all(entry.path())?;
                 }
             }
         }
@@ -78,7 +78,7 @@ pub fn walk_compare(p: &Path, p2: &Path) {
                     println!("updating {}...\n", entry.path().to_str().unwrap());
                     fs::copy(entry.path(), mirror_path).expect("error copying file");
                 } else {
-                    sync_deleted_items(&entry.path(), &mirror_path);
+                    sync_deleted_items(&entry.path(), &mirror_path).unwrap();
                     walk_compare(&entry.path(), &mirror_path);
                 }
             }
