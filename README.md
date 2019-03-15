@@ -1,5 +1,5 @@
 # backupr19
-custom backup tool written in rust
+Custom backup tool written in rust
 
 Add a config.txt to the root. Format should be line 1: full path of original directory to be backed up; line 2: full path to folder to contain the backup; e.g.
 
