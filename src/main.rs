@@ -1,3 +1,5 @@
+extern crate fxhash;
+
 use std::path::Path;
 use std::fs;
 
